@@ -1,7 +1,7 @@
 package application;
 
 /**
- * Created by vladt89 on 18.11.14.
+ * @author vladimir
  */
 public interface Car {
     void create();
