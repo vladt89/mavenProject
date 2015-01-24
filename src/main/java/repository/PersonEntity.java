@@ -1,6 +1,6 @@
 package repository;
 
-import service.WorkTime;
+import service.parser.WorkTime;
 
 import java.util.LinkedList;
 import java.util.List;

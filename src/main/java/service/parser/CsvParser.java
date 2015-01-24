@@ -1,16 +1,17 @@
-package service;
+package service.parser;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang.time.DateUtils;
 import repository.PersonEntity;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,22 +21,11 @@ import java.util.Map;
  */
 public class CsvParser {
 
+    private Map<Integer, PersonEntity> integerPersonEntityMap;
+    private String pathToFile = "inputData/HourList201403.csv";
+
     public CsvParser() {
-    }
-
-    public CsvParser(String pathToFile) {
-        Map<Integer, PersonEntity> integerPersonEntityMap = parseCsvFile(pathToFile);
-
-        //check the results //TODO remove later
-        for (Integer integer : integerPersonEntityMap.keySet()) {
-            PersonEntity personEntity = integerPersonEntityMap.get(integer);
-            System.out.println("Person: " + personEntity.getName());
-            List<WorkTime> workingDays = personEntity.getWorkingDays();
-            for (WorkTime workingDay : workingDays) {
-                System.out.println("Date: " + workingDay.getDate() + " Start: " + workingDay.getStartTime() + ". End: " + workingDay.getEndTime());
-            }
-            System.out.println(workingDays.size());
-        }
+        integerPersonEntityMap = parseCsvFile(pathToFile);
     }
 
     /**
@@ -73,14 +63,31 @@ public class CsvParser {
     }
 
     private WorkTime parseDate(CSVRecord record) {
-        WorkTime workTime = new WorkTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyyHH:mm");
+        Date startTime = null;
+        Date endTime = null;
         try {
-            workTime.setDate(new SimpleDateFormat("dd.MM.yyyy").parse(record.get("Date")));
-            workTime.setStartTime(record.get("Start"));
-            workTime.setEndTime(record.get("End"));
+            startTime = dateFormat.parse(record.get("Date") + record.get("Start"));
+            endTime = dateFormat.parse(record.get("Date") + record.get("End"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        WorkTime workTime = new WorkTime();
+        workTime.setStartTime(startTime);
+        if (endTime != null) {
+            if (endTime.before(startTime)) {
+                endTime = DateUtils.addDays(endTime, 1);
+            }
+        }
+        workTime.setEndTime(endTime);
         return workTime;
+    }
+
+    public Map<Integer, PersonEntity> getIntegerPersonEntityMap() {
+        return integerPersonEntityMap;
+    }
+
+    public void setPathToFile(String pathToFile) {
+        this.pathToFile = pathToFile;
     }
 }
