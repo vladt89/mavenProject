@@ -1,6 +1,8 @@
 package repository;
 
-import java.util.Date;
+import service.WorkTime;
+
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ import java.util.List;
 public class PersonEntity {
     private String name;
     private int id;
-    private List<Date> workingDays;
+    private List<WorkTime> workingDays = new LinkedList<>();
 
     public String getName() {
         return name;
@@ -21,7 +23,7 @@ public class PersonEntity {
         return id;
     }
 
-    public List<Date> getWorkingDays() {
+    public List<WorkTime> getWorkingDays() {
         return workingDays;
     }
 
@@ -33,7 +35,7 @@ public class PersonEntity {
         this.id = id;
     }
 
-    public void setWorkingDays(List<Date> workingDays) {
+    public void setWorkingDays(List<WorkTime> workingDays) {
         this.workingDays = workingDays;
     }
 }

@@ -7,7 +7,10 @@ import repository.PersonEntity;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +24,18 @@ public class CsvParser {
     }
 
     public CsvParser(String pathToFile) {
-        parseCsvFile(pathToFile);
+        Map<Integer, PersonEntity> integerPersonEntityMap = parseCsvFile(pathToFile);
+
+        //check the results //TODO remove later
+        for (Integer integer : integerPersonEntityMap.keySet()) {
+            PersonEntity personEntity = integerPersonEntityMap.get(integer);
+            System.out.println("Person: " + personEntity.getName());
+            List<WorkTime> workingDays = personEntity.getWorkingDays();
+            for (WorkTime workingDay : workingDays) {
+                System.out.println("Date: " + workingDay.getDate() + " Start: " + workingDay.getStartTime() + ". End: " + workingDay.getEndTime());
+            }
+            System.out.println(workingDays.size());
+        }
     }
 
     /**
@@ -39,18 +53,34 @@ public class CsvParser {
             e.printStackTrace();
         }
 
-        Map<Integer, PersonEntity> idToPersonEntity = new HashMap<>();
+        Map<Integer, PersonEntity> idToPersonEntityMap = new HashMap<>();
         if (parser != null) {
             for (CSVRecord record : parser) {
                 int personId = Integer.parseInt(record.get("Person ID"));
-                if (!idToPersonEntity.containsKey(personId)) {
+                if (!idToPersonEntityMap.containsKey(personId)) {
                     PersonEntity person = new PersonEntity();
                     person.setName(record.get("Person Name"));
                     person.setId(personId);
-                    idToPersonEntity.put(personId, person);
+                    person.getWorkingDays().add(parseDate(record));
+                    idToPersonEntityMap.put(personId, person);
+                } else {
+                    PersonEntity person = idToPersonEntityMap.get(personId);
+                    person.getWorkingDays().add(parseDate(record));
                 }
             }
         }
-        return idToPersonEntity;
+        return idToPersonEntityMap;
+    }
+
+    private WorkTime parseDate(CSVRecord record) {
+        WorkTime workTime = new WorkTime();
+        try {
+            workTime.setDate(new SimpleDateFormat("dd.MM.yyyy").parse(record.get("Date")));
+            workTime.setStartTime(record.get("Start"));
+            workTime.setEndTime(record.get("End"));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return workTime;
     }
 }
