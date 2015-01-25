@@ -23,12 +23,12 @@ public class WageServiceImpl implements WageService {
         Date endDate = workTime.getEndTime();
         Date startDate = workTime.getStartTime();
 
-        double regularDailyWage = calculateRegularDailyWage(endDate, startDate);
-
         //calculate overtime
         double overtimeCompensation = 0;
 
-        return regularDailyWage + calculateEveningCompensation(endDate) + overtimeCompensation;
+        return calculateRegularDailyWage(endDate, startDate)
+                + calculateEveningCompensation(endDate)
+                + overtimeCompensation;
     }
 
     @Override

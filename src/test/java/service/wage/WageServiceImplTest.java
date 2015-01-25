@@ -79,6 +79,6 @@ public class WageServiceImplTest {
         double result = wageService.calculateEveningCompensation(endOfWork);
 
         //VERIFY
-        Assert.assertEquals(wageService.EVENING_COMPENSATION, result, DELTA);
+        Assert.assertEquals(WageServiceImpl.EVENING_COMPENSATION, result, DELTA);
     }
 }

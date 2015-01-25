@@ -43,4 +43,8 @@ public class RunningServiceImpl implements RunningService {
     public void setParser(CsvParser parser) {
         this.parser = parser;
     }
+
+    public void setWageService(WageService wageService) {
+        this.wageService = wageService;
+    }
 }
