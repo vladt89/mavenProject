@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Test class for {@link CsvParser}.
+ *
  * @author vladimir.tikhomirov
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -24,24 +26,26 @@ public class CsvParserTest {
     private CsvParser csvParser;
 
     /**
-     * Tests {@link service.parser.CsvParser#parseCsvFile(String)}. Happy path.
+     * Tests {@link CsvParser#parseCsvFile(String)}. Happy path.
      */
     @Test
     public void testParseCsvFile() throws Exception {
         //EXERCISE
         Map<Integer, PersonEntity> idToPersonEntity = csvParser.parseCsvFile("src/test/testData/HourList201403.csv");
 
+        //PREPARE DATA FOR VERIFICATION
         PersonEntity firstPerson = idToPersonEntity.get(1);
         List<WorkTime> firstPersonWorkingDays = firstPerson.getWorkingDays();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        Date startDate = sdf.parse("03/03/2014 9:30");
+        Date endDate = sdf.parse("03/03/2014 17:00");
+        WorkTime firstWorkDayOfFirstPerson = firstPersonWorkingDays.get(0);
 
         //VERIFY
         Assert.assertEquals(3, idToPersonEntity.size());
         Assert.assertEquals("Janet Java", firstPerson.getName());
         Assert.assertEquals(23, firstPersonWorkingDays.size());
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        Date startDate = sdf.parse("03/03/2014 9:30");
-        Assert.assertEquals(0, firstPerson.getWorkingDays().get(0).getStartTime().compareTo(startDate));
-        Date endDate = sdf.parse("03/03/2014 17:00");
-        Assert.assertEquals(0, firstPerson.getWorkingDays().get(0).getEndTime().compareTo(endDate));
+        Assert.assertTrue(firstWorkDayOfFirstPerson.getStartTime().equals(startDate));
+        Assert.assertTrue(firstWorkDayOfFirstPerson.getEndTime().equals(endDate));
     }
 }

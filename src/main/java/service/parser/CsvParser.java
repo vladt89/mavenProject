@@ -21,11 +21,11 @@ import java.util.Map;
  */
 public class CsvParser {
 
-    private Map<Integer, PersonEntity> integerPersonEntityMap;
+    private Map<Integer, PersonEntity> idToPersonEntityMap;
     private String pathToFile = "inputData/HourList201403.csv";
 
     public CsvParser() {
-        integerPersonEntityMap = parseCsvFile(pathToFile);
+        idToPersonEntityMap = parseCsvFile(pathToFile);
     }
 
     /**
@@ -83,8 +83,8 @@ public class CsvParser {
         return workTime;
     }
 
-    public Map<Integer, PersonEntity> getIntegerPersonEntityMap() {
-        return integerPersonEntityMap;
+    public Map<Integer, PersonEntity> getIdToPersonEntityMap() {
+        return idToPersonEntityMap;
     }
 
     public void setPathToFile(String pathToFile) {

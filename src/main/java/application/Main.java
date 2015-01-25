@@ -19,7 +19,7 @@ public class Main {
 
         ApplicationContext context = new ClassPathXmlApplicationContext("spring-config.xml");
         CsvParser pa = (CsvParser) context.getBean("csvParser");
-        Map<Integer, PersonEntity> integerPersonEntityMap = pa.getIntegerPersonEntityMap();
+        Map<Integer, PersonEntity> integerPersonEntityMap = pa.getIdToPersonEntityMap();
 
         RunningServiceImpl runningService = new RunningServiceImpl();
         runningService.run();
