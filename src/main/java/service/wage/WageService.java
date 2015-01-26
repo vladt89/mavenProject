@@ -1,10 +1,13 @@
 package service.wage;
 
+import repository.PersonEntity;
 import repository.WorkTime;
 
 import java.util.Date;
 
 /**
+ * Interface which contains the declarations of the methods for salary calculation.
+ *
  * @author vladimir.tikhomirov
  */
 public interface WageService {
@@ -33,4 +36,20 @@ public interface WageService {
      * @return salary amount
      */
     double calculateEveningCompensation(Date endTime);
+
+    /**
+     * Calculates compensation for the overtime (the person was working more than 8 hours during specific day).
+     *
+     * @param overtimeHours amount of overtime hours
+     * @return salary amount
+     */
+    double calculateOvertimeCompensation(double overtimeHours);
+
+    /**
+     * Calculates the total salary amount for the specific object
+     *
+     * @param person person for whom total salary is going to be calculated
+     * @return total salary amount
+     */
+    double calculateTotalSalary(PersonEntity person);
 }

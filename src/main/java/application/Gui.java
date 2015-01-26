@@ -1,13 +1,14 @@
 package application;
 
 import repository.PersonEntity;
-import repository.WorkTime;
-import service.parser.CsvParser;
-import service.wage.WageService;
+import service.RunningServiceImpl;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -17,19 +18,24 @@ import java.util.Map;
  */
 public class Gui {
 
-    private CsvParser parser;
-    private WageService wageService;
+    private static final int AMOUNT_OF_COLUMNS = 4;
+    private final RunningServiceImpl runningService;
+    private final JPanel panel;
+    private final JFrame frame;
+    private Map<Integer, PersonEntity> idToPersonEntityMap;
 
-    public Gui() {
-        JFrame frame = new JFrame("Wage system");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setMinimumSize(new Dimension(300, 300));
+    public Gui(RunningServiceImpl runningService) {
+        this.runningService = runningService;
+
+        frame = new JFrame("Wage system");
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setMinimumSize(new Dimension(500, 500));
+        frame.setResizable(false);
         frame.setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
+        panel = new JPanel();
         panel.add(createLoadButton());
         frame.add(panel, BorderLayout.CENTER);
-
         frame.setVisible(true);
     }
 
@@ -38,45 +44,54 @@ public class Gui {
         button.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                actionHappens(button);
+                final JFileChooser fileChooser = new JFileChooser();
+                if (fileChooser.showOpenDialog(button) == JFileChooser.APPROVE_OPTION) {
+                    idToPersonEntityMap = runningService.getParser().parseCsvFile(fileChooser.getSelectedFile().getPath());
+                }
+                analyzeAndShowPersonsData();
             }
         });
         return button;
     }
 
-    private void actionHappens(JButton button) {
-        final JFileChooser fileChooser = new JFileChooser();
-        int returnVal = fileChooser.showOpenDialog(button);
-
-        Map<Integer, PersonEntity> idToPersonEntityMap = null;
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            idToPersonEntityMap = parser.parseCsvFile(fileChooser.getSelectedFile().getPath());
-        }
-        //check the results //TODO remove later
+    private void analyzeAndShowPersonsData() {
         for (Integer personId : idToPersonEntityMap.keySet()) {
             PersonEntity personEntity = idToPersonEntityMap.get(personId);
-            System.out.println("Person: " + personEntity.getName());
-            java.util.List<WorkTime> workingDays = personEntity.getWorkingDays();
-
-            double totalSalary = 0;
-            for (WorkTime workingDay : workingDays) {
-                double dailyPay = wageService.calculateDailyPay(workingDay);
-                totalSalary += dailyPay;
-                System.out.println("StartTime: " + workingDay.getStartTime()
-                        + " EndTime: " + workingDay.getEndTime()
-                        + " DailyPay: " + dailyPay);
-            }
-            System.out.println("Salary: " + totalSalary);
-            System.out.println(workingDays.size());
+            personEntity.setSalary(runningService.getWageService().calculateTotalSalary(personEntity));
+        }
+        if (idToPersonEntityMap != null) {
+            JTable table = createTable();
+            table.setModel(fillTable());
         }
     }
 
-    public void setParser(CsvParser parser) {
-        this.parser = parser;
+    private JTable createTable() {
+        JTable table = new JTable(idToPersonEntityMap.size(), AMOUNT_OF_COLUMNS);
+        table.setPreferredScrollableViewportSize(new Dimension(400, 70));
+        table.setFillsViewportHeight(true);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        panel.add(scrollPane);
+        frame.revalidate();
+        return table;
     }
 
-    public void setWageService(WageService wageService) {
-        this.wageService = wageService;
+    private TableModel fillTable() {
+        java.util.List<String> columns = new LinkedList<>();
+        columns.add("ID");
+        columns.add("Employee");
+        columns.add("Total Salary");
+
+        java.util.List<String[]> values = new LinkedList<>();
+        for (int i = 1; i <= idToPersonEntityMap.size(); i++) {
+            PersonEntity personEntity = idToPersonEntityMap.get(i);
+            values.add(new String[] {
+                    String.valueOf(personEntity.getId()),
+                    personEntity.getName(),
+                    String.valueOf(personEntity.getSalary())
+                    });
+        }
+        return new DefaultTableModel(values.toArray(new Object[][] {}), columns.toArray());
     }
 }
 

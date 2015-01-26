@@ -81,4 +81,60 @@ public class WageServiceImplTest {
         //VERIFY
         Assert.assertEquals(WageServiceImpl.EVENING_COMPENSATION, result, DELTA);
     }
+
+    /**
+     * Tests {@link WageService#calculateOvertimeCompensation(double)}
+     * when the person worked more than 8 hours, but his overtime was not more than 2 hours.
+     */
+    @Test
+    public void testCalculateOvertimeCompensationWithinFirstTwoHours() throws Exception {
+        //SETUP SUT
+        int workingHours = 9;
+        double overtime = workingHours - WageServiceImpl.NORMAL_WORK_DAY_IN_HOURS;
+
+        //EXERCISE
+        double result = wageService.calculateOvertimeCompensation(overtime);
+
+        //VERIFY
+        Assert.assertEquals(WageServiceImpl.OVERTIME_PERCENT_FOR_FIRST_2_HOURS * overtime, result, DELTA);
+    }
+
+    /**
+     * Tests {@link WageService#calculateOvertimeCompensation(double)}
+     * when the person worked more than 8 hours, but his overtime was not more than 4 hours and not less than 2.
+     */
+    @Test
+    public void testCalculateOvertimeCompensationWithinFirstFourHours() throws Exception {
+        //SETUP SUT
+        int workingHours = 11;
+        double overtime = workingHours - WageServiceImpl.NORMAL_WORK_DAY_IN_HOURS;
+
+        //EXERCISE
+        double result = wageService.calculateOvertimeCompensation(overtime);
+
+        //VERIFY
+        double expected = WageServiceImpl.OVERTIME_PERCENT_FOR_FIRST_2_HOURS * 2
+                + WageServiceImpl.OVERTIME_PERCENT_FOR_SECOND_2_HOURS;
+        Assert.assertEquals(expected, result, DELTA);
+    }
+
+    /**
+     * Tests {@link WageService#calculateOvertimeCompensation(double)}
+     * when the person worked more than 8 hours and his overtime was more than 4 hours.
+     */
+    @Test
+    public void testCalculateOvertimeCompensationWithMoreThanFourHours() throws Exception {
+        //SETUP SUT
+        int workingHours = 13;
+        double overtime = workingHours - WageServiceImpl.NORMAL_WORK_DAY_IN_HOURS;
+
+        //EXERCISE
+        double result = wageService.calculateOvertimeCompensation(overtime);
+
+        //VERIFY
+        double expected = WageServiceImpl.OVERTIME_PERCENT_FOR_FIRST_2_HOURS * 2
+                + WageServiceImpl.OVERTIME_PERCENT_FOR_SECOND_2_HOURS * 2
+                + WageServiceImpl.OVERTIME_PERCENT_AFTER_4_HOURS;
+        Assert.assertEquals(expected, result, DELTA);
+    }
 }

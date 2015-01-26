@@ -4,16 +4,11 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-       <bean id="gui" class="application.Gui">
-              <property name="parser" ref="csvParser"/>
-              <property name="wageService" ref="wageService"/>
-       </bean>
-
        <bean id="csvParser" class="service.parser.CsvParser"/>
 
        <bean id="wageService" class="service.wage.WageServiceImpl"/>
 
-       <bean id="runningService" class="service.RunningServiceImpl">
+       <bean id="runningService" class="service.RunningServiceImpl" init-method="run">
               <property name="parser" ref="csvParser"/>
               <property name="wageService" ref="wageService"/>
        </bean>

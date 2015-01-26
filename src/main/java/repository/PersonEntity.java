@@ -12,6 +12,7 @@ public class PersonEntity {
     private String name;
     private int id;
     private List<WorkTime> workingDays = new LinkedList<>();
+    private double salary = 0;
 
     public String getName() {
         return name;
@@ -33,7 +34,11 @@ public class PersonEntity {
         this.id = id;
     }
 
-    public void setWorkingDays(List<WorkTime> workingDays) {
-        this.workingDays = workingDays;
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
     }
 }

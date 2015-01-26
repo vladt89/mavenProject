@@ -22,8 +22,6 @@ import java.util.Map;
  */
 public class CsvParser {
 
-    private Map<Integer, PersonEntity> idToPersonEntityMap;
-
     public CsvParser() {
 
     }
@@ -43,7 +41,7 @@ public class CsvParser {
             e.printStackTrace();
         }
 
-        idToPersonEntityMap = new HashMap<>();
+        Map<Integer, PersonEntity> idToPersonEntityMap = new HashMap<>();
         if (parser != null) {
             for (CSVRecord record : parser) {
                 int personId = Integer.parseInt(record.get("Person ID"));
@@ -82,9 +80,4 @@ public class CsvParser {
         workTime.setEndTime(endTime);
         return workTime;
     }
-
-    public Map<Integer, PersonEntity> getIdToPersonEntityMap() {
-        return idToPersonEntityMap;
-    }
-
 }

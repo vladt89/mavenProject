@@ -6,7 +6,7 @@ package service;
 public interface RunningService {
 
     /**
-     * Start the main process of parsing and analysing the parsing data.
+     * Start the application.
      */
     void run();
 }
