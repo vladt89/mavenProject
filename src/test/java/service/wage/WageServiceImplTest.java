@@ -26,7 +26,7 @@ public class WageServiceImplTest {
     WageServiceImpl wageService;
 
     /**
-     * Tests {@link WageService#calculateDailyPay(service.parser.WorkTime)} when the person worked several hours.
+     * Tests {@link WageService#calculateDailyPay(repository.WorkTime)} when the person worked several hours.
      */
     @Test
     public void testCalculateDailyPay() throws Exception {
@@ -43,7 +43,7 @@ public class WageServiceImplTest {
     }
 
     /**
-     * Tests {@link WageService#calculateDailyPay(service.parser.WorkTime)} when the person worked several hours.
+     * Tests {@link WageService#calculateDailyPay(repository.WorkTime)} when the person worked several hours.
      */
     @Test
     public void testCalculateDailyPayWithSomeMinutes() throws Exception {

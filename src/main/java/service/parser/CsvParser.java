@@ -5,6 +5,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.time.DateUtils;
 import repository.PersonEntity;
+import repository.WorkTime;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -22,10 +23,9 @@ import java.util.Map;
 public class CsvParser {
 
     private Map<Integer, PersonEntity> idToPersonEntityMap;
-    private String pathToFile = "inputData/HourList201403.csv";
 
     public CsvParser() {
-        idToPersonEntityMap = parseCsvFile(pathToFile);
+
     }
 
     /**
@@ -34,7 +34,7 @@ public class CsvParser {
      * @param pathToFile file to parse
      * @return map of person ids to person entity
      */
-    protected Map<Integer, PersonEntity> parseCsvFile(String pathToFile) {
+    public Map<Integer, PersonEntity> parseCsvFile(String pathToFile) {
         CSVFormat format = CSVFormat.RFC4180.withHeader().withDelimiter(',');
         CSVParser parser = null;
         try {
@@ -43,7 +43,7 @@ public class CsvParser {
             e.printStackTrace();
         }
 
-        Map<Integer, PersonEntity> idToPersonEntityMap = new HashMap<>();
+        idToPersonEntityMap = new HashMap<>();
         if (parser != null) {
             for (CSVRecord record : parser) {
                 int personId = Integer.parseInt(record.get("Person ID"));
@@ -87,7 +87,4 @@ public class CsvParser {
         return idToPersonEntityMap;
     }
 
-    public void setPathToFile(String pathToFile) {
-        this.pathToFile = pathToFile;
-    }
 }

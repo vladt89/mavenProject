@@ -1,6 +1,6 @@
 package service.wage;
 
-import service.parser.WorkTime;
+import repository.WorkTime;
 
 import java.util.Calendar;
 import java.util.Date;

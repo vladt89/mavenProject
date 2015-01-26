@@ -4,9 +4,12 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-       <bean id="csvParser" class="service.parser.CsvParser">
-              <property name="pathToFile" value="inputData/HourList201403.csv"/>
+       <bean id="gui" class="application.Gui">
+              <property name="parser" ref="csvParser"/>
+              <property name="wageService" ref="wageService"/>
        </bean>
+
+       <bean id="csvParser" class="service.parser.CsvParser"/>
 
        <bean id="wageService" class="service.wage.WageServiceImpl"/>
 

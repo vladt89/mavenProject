@@ -1,4 +1,4 @@
-package service.parser;
+package repository;
 
 import java.util.Date;
 
