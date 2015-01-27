@@ -2,6 +2,7 @@ package application;
 
 import repository.PersonEntity;
 import service.RunningServiceImpl;
+import service.parser.CsvParsingException;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -18,7 +19,6 @@ import java.util.Map;
  */
 public class Gui {
 
-    private static final int AMOUNT_OF_COLUMNS = 4;
     private final RunningServiceImpl runningService;
     private final JPanel panel;
     private final JFrame frame;
@@ -43,15 +43,29 @@ public class Gui {
         final JButton button = new JButton("Load csv file");
         button.addActionListener(new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent actionEvent) {
                 final JFileChooser fileChooser = new JFileChooser();
                 if (fileChooser.showOpenDialog(button) == JFileChooser.APPROVE_OPTION) {
-                    idToPersonEntityMap = runningService.getParser().parseCsvFile(fileChooser.getSelectedFile().getPath());
+                    String pathToFile = fileChooser.getSelectedFile().getPath();
+                    if (FileValidator.validate(pathToFile)) {
+                        try {
+                            idToPersonEntityMap = runningService.getParser().parseCsvFile(pathToFile);
+                        } catch (CsvParsingException e) {
+                            showErrorMessage(e.getMessage());
+                            return;
+                        }
+                        analyzeAndShowPersonsData();
+                    } else {
+                        showErrorMessage("File type is wrong. Please, load csv file, other types are no supported.");
+                    }
                 }
-                analyzeAndShowPersonsData();
             }
         });
         return button;
+    }
+
+    private static void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(new JFrame(), message, "Error Dialog", JOptionPane.ERROR_MESSAGE);
     }
 
     private void analyzeAndShowPersonsData() {
@@ -66,7 +80,7 @@ public class Gui {
     }
 
     private JTable createTable() {
-        JTable table = new JTable(idToPersonEntityMap.size(), AMOUNT_OF_COLUMNS);
+        JTable table = new JTable();
         table.setPreferredScrollableViewportSize(new Dimension(400, 70));
         table.setFillsViewportHeight(true);
 

@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.log4j.Logger;
 import repository.PersonEntity;
 import repository.WorkTime;
 
@@ -22,6 +23,8 @@ import java.util.Map;
  */
 public class CsvParser {
 
+    private static final Logger LOG = Logger.getLogger(CsvParser.class);
+
     public CsvParser() {
 
     }
@@ -32,29 +35,29 @@ public class CsvParser {
      * @param pathToFile file to parse
      * @return map of person ids to person entity
      */
-    public Map<Integer, PersonEntity> parseCsvFile(String pathToFile) {
+    public Map<Integer, PersonEntity> parseCsvFile(String pathToFile) throws CsvParsingException {
         CSVFormat format = CSVFormat.RFC4180.withHeader().withDelimiter(',');
-        CSVParser parser = null;
+        CSVParser parser;
         try {
             parser = new CSVParser(new FileReader(pathToFile), format);
         } catch (IOException e) {
-            e.printStackTrace();
+            String message = "Cannot parse the file: " + pathToFile + " " + e.toString();
+            LOG.error(message);
+            throw new CsvParsingException(message);
         }
 
         Map<Integer, PersonEntity> idToPersonEntityMap = new HashMap<>();
-        if (parser != null) {
-            for (CSVRecord record : parser) {
-                int personId = Integer.parseInt(record.get("Person ID"));
-                if (!idToPersonEntityMap.containsKey(personId)) {
-                    PersonEntity person = new PersonEntity();
-                    person.setName(record.get("Person Name"));
-                    person.setId(personId);
-                    person.getWorkingDays().add(parseDate(record));
-                    idToPersonEntityMap.put(personId, person);
-                } else {
-                    PersonEntity person = idToPersonEntityMap.get(personId);
-                    person.getWorkingDays().add(parseDate(record));
-                }
+        for (CSVRecord record : parser) {
+            int personId = Integer.parseInt(record.get("Person ID"));
+            if (!idToPersonEntityMap.containsKey(personId)) {
+                PersonEntity person = new PersonEntity();
+                person.setName(record.get("Person Name"));
+                person.setId(personId);
+                person.getWorkingDays().add(parseDate(record));
+                idToPersonEntityMap.put(personId, person);
+            } else {
+                PersonEntity person = idToPersonEntityMap.get(personId);
+                person.getWorkingDays().add(parseDate(record));
             }
         }
         return idToPersonEntityMap;

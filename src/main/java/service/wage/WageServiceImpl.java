@@ -1,5 +1,6 @@
 package service.wage;
 
+import org.apache.log4j.Logger;
 import repository.PersonEntity;
 import repository.WorkTime;
 
@@ -13,6 +14,8 @@ import java.util.Date;
  */
 public class WageServiceImpl implements WageService {
 
+    private static final Logger LOG = Logger.getLogger(WageServiceImpl.class);
+
     protected static final double HOURLY_WAGE = 3.75; //amount in dollars
     protected static final double EVENING_COMPENSATION = 1.15; //amount in dollars
     private static final int END_OF_WORK_DAY_HOUR = 18;
@@ -25,15 +28,20 @@ public class WageServiceImpl implements WageService {
     public double calculateDailyPay(WorkTime workTime) {
         Date endDate = workTime.getEndTime();
         Date startDate = workTime.getStartTime();
+        LOG.info("Calculate daily pay for the day: " + startDate);
 
         double dailyPay;
         double overtimeHours = calculateWorkingHours(endDate, startDate) - NORMAL_WORK_DAY_IN_HOURS;
         double regularDailyWage = calculateRegularDailyWage(endDate, startDate);
         if (overtimeHours > 0) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("During this day was done overtime with " + overtimeHours + " hours, overtime compensation is coming");
+            }
             dailyPay = regularDailyWage + calculateOvertimeCompensation(overtimeHours);
         } else {
             dailyPay = regularDailyWage + calculateEveningCompensation(endDate);
         }
+        LOG.info("Daily pay for the day is " + dailyPay);
         return dailyPay;
     }
 
@@ -79,6 +87,9 @@ public class WageServiceImpl implements WageService {
 
         double eveningCompensation = 0;
         if (endOfWorkTime.before(endTime)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("During this day the person as working in the evening, evening compensation is coming");
+            }
             double eveningHours = calculateWorkingHours(endTime, endOfWorkTime);
             eveningCompensation = eveningHours * EVENING_COMPENSATION;
         }
@@ -87,19 +98,16 @@ public class WageServiceImpl implements WageService {
 
     @Override
     public double calculateTotalSalary(PersonEntity personEntity) {
-        System.out.println("Person: " + personEntity.getName());
-        java.util.List<WorkTime> workingDays = personEntity.getWorkingDays();
+        LOG.info("Calculate total salary for person " + personEntity.getName() + " [" + personEntity.getId() + "]");
 
+        java.util.List<WorkTime> workingDays = personEntity.getWorkingDays();
         double totalSalary = 0;
         for (WorkTime workingDay : workingDays) {
             double dailyPay = calculateDailyPay(workingDay);
             totalSalary += dailyPay;
-            System.out.println("StartTime: " + workingDay.getStartTime()
-                    + " EndTime: " + workingDay.getEndTime()
-                    + " DailyPay: " + dailyPay);
         }
-        System.out.println("Salary: " + totalSalary);
-        System.out.println(workingDays.size());
+        LOG.info("Salary for " + workingDays.size() + " working days was calculated successfully" +
+                ", amount: " + totalSalary);
         return totalSalary;
     }
 
