@@ -2,7 +2,7 @@ package service;
 
 import application.Gui;
 import service.parser.CsvParser;
-import service.wage.WageService;
+import service.wage.WageServiceImpl;
 
 /**
  * Service to start the application and make service methods get ready to work with UI.
@@ -12,7 +12,7 @@ import service.wage.WageService;
 public class RunningServiceImpl implements RunningService {
 
     private CsvParser parser;
-    private WageService wageService;
+    private WageServiceImpl wageService;
 
     public RunningServiceImpl() {
     }
@@ -26,7 +26,7 @@ public class RunningServiceImpl implements RunningService {
         this.parser = parser;
     }
 
-    public void setWageService(WageService wageService) {
+    public void setWageService(WageServiceImpl wageService) {
         this.wageService = wageService;
     }
 
@@ -34,7 +34,7 @@ public class RunningServiceImpl implements RunningService {
         return parser;
     }
 
-    public WageService getWageService() {
+    public WageServiceImpl getWageService() {
         return wageService;
     }
 }

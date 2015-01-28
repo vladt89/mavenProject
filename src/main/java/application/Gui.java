@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User interface for the application.
@@ -71,11 +72,29 @@ public class Gui {
     private void analyzeAndShowPersonsData() {
         for (Integer personId : idToPersonEntityMap.keySet()) {
             PersonEntity personEntity = idToPersonEntityMap.get(personId);
-            personEntity.setSalary(runningService.getWageService().calculateTotalSalary(personEntity));
+            personEntity.setSalaryPerMonth(runningService.getWageService().calculateSalariesPerMonth(personEntity));
         }
         if (!idToPersonEntityMap.isEmpty()) {
-            JTable table = createTable();
-            table.setModel(fillTable());
+            JLabel monthLabel = new JLabel("Month: ");
+            panel.add(monthLabel);
+            JComboBox dropDownList = new JComboBox();
+            Set<Integer> monthSet = runningService.getWageService().getMonthSet();
+            for (Integer month : monthSet) {
+                dropDownList.addItem(month + 1);
+            }
+            panel.add(dropDownList);
+            frame.revalidate();
+
+            dropDownList.addActionListener(new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JComboBox comboBox = (JComboBox) e.getSource();
+                    Integer selectedMonth = (Integer) comboBox.getSelectedItem() - 1;
+
+                    JTable table = createTable();
+                    table.setModel(fillTable(selectedMonth));
+                }
+            });
         } else {
             showErrorMessage("Unfortunately the parsing data is empty. Please, verify if you load a proper file and try again.");
         }
@@ -92,7 +111,7 @@ public class Gui {
         return table;
     }
 
-    private TableModel fillTable() {
+    private TableModel fillTable(Integer month) {
         java.util.List<String> columns = new LinkedList<>();
         columns.add("ID");
         columns.add("Employee");
@@ -101,11 +120,14 @@ public class Gui {
         java.util.List<String[]> values = new LinkedList<>();
         for (int i = 1; i <= idToPersonEntityMap.size(); i++) {
             PersonEntity personEntity = idToPersonEntityMap.get(i);
-            values.add(new String[] {
-                    String.valueOf(personEntity.getId()),
-                    personEntity.getName(),
-                    String.valueOf(personEntity.getSalary())
-                    });
+            Double salaryPerMonth = personEntity.getSalaryPerMonth()[month];
+            if (salaryPerMonth != 0.0) {
+                values.add(new String[]{
+                        String.valueOf(personEntity.getId()),
+                        personEntity.getName(),
+                        String.valueOf(salaryPerMonth)
+                });
+            }
         }
         return new DefaultTableModel(values.toArray(new Object[][] {}), columns.toArray());
     }

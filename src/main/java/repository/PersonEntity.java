@@ -12,7 +12,8 @@ public class PersonEntity {
     private String name;
     private int id;
     private List<WorkTime> workingDays = new LinkedList<>();
-    private double salary = 0;
+    private double totalSalary = 0;
+    private Double[] salaryPerMonth;
 
     public String getName() {
         return name;
@@ -34,11 +35,19 @@ public class PersonEntity {
         this.id = id;
     }
 
-    public double getSalary() {
-        return salary;
+    public double getTotalSalary() {
+        return totalSalary;
     }
 
-    public void setSalary(double salary) {
-        this.salary = salary;
+    public void setTotalSalary(double totalSalary) {
+        this.totalSalary = totalSalary;
+    }
+
+    public Double[] getSalaryPerMonth() {
+        return salaryPerMonth;
+    }
+
+    public void setSalaryPerMonth(Double[] salaryPerMonth) {
+        this.salaryPerMonth = salaryPerMonth;
     }
 }

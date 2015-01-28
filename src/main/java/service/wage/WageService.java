@@ -46,10 +46,10 @@ public interface WageService {
     double calculateOvertimeCompensation(double overtimeHours);
 
     /**
-     * Calculates the total salary amount for the specific object
+     * Calculates the salary amounts for the specific person.
      *
-     * @param person person for whom total salary is going to be calculated
-     * @return total salary amount
+     * @param personEntity person for whom salaries are going to be calculated
+     * @return arrays of salaries per month
      */
-    double calculateTotalSalary(PersonEntity person);
+    Double[] calculateSalariesPerMonth(PersonEntity personEntity);
 }

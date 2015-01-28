@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +82,11 @@ public class CsvParser {
             LOG.error(message);
             throw new CsvParsingException(message);
         }
+
         WorkTime workTime = new WorkTime();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startTime);
+        workTime.setMonth(cal.get(Calendar.MONTH));
         workTime.setStartTime(startTime);
         if (endTime != null) {
             if (endTime.before(startTime)) {

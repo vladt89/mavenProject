@@ -4,8 +4,12 @@ import org.apache.log4j.Logger;
 import repository.PersonEntity;
 import repository.WorkTime;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Class that defines service methods to handle wage calculation process.
@@ -23,6 +27,7 @@ public class WageServiceImpl implements WageService {
     protected static final double OVERTIME_PERCENT_FOR_FIRST_2_HOURS = HOURLY_WAGE * 1.25;
     protected static final double OVERTIME_PERCENT_FOR_SECOND_2_HOURS = HOURLY_WAGE * 1.5;
     protected static final double OVERTIME_PERCENT_AFTER_4_HOURS =  HOURLY_WAGE * 2;
+    private Set<Integer> monthSet = new HashSet<>();
 
     @Override
     public double calculateDailyPay(WorkTime workTime) {
@@ -97,22 +102,33 @@ public class WageServiceImpl implements WageService {
     }
 
     @Override
-    public double calculateTotalSalary(PersonEntity personEntity) {
+    public Double[] calculateSalariesPerMonth(PersonEntity personEntity) {
         LOG.info("Calculate total salary for person " + personEntity.getName() + " [" + personEntity.getId() + "]");
 
-        java.util.List<WorkTime> workingDays = personEntity.getWorkingDays();
+        List<WorkTime> workingDays = personEntity.getWorkingDays();
+        Double[] salaryPerMonthList = new Double[12];
+        Arrays.fill(salaryPerMonthList, 0.0);
         double totalSalary = 0;
         for (WorkTime workingDay : workingDays) {
             double dailyPay = calculateDailyPay(workingDay);
             totalSalary += dailyPay;
+
+            int month = workingDay.getMonth();
+            monthSet.add(month);
+            salaryPerMonthList[month] += dailyPay;
         }
         LOG.info("Salary for " + workingDays.size() + " working days was calculated successfully" +
                 ", amount: " + totalSalary);
-        return totalSalary;
+        return salaryPerMonthList;
     }
 
     private double calculateWorkingHours(Date endDate, Date startDate) {
         long diffInMilliSeconds = endDate.getTime() - startDate.getTime();
         return (double) diffInMilliSeconds/1000/60/60;
     }
+
+    public Set<Integer> getMonthSet() {
+        return monthSet;
+    }
+
 }
