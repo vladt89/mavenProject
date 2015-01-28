@@ -49,4 +49,22 @@ public class CsvParserTest {
         Assert.assertTrue(firstWorkDayOfFirstPerson.getStartTime().equals(startDate));
         Assert.assertTrue(firstWorkDayOfFirstPerson.getEndTime().equals(endDate));
     }
+
+    /**
+     * Tests {@link service.parser.CsvParser#parseCsvFile(String)} when the date cannot be parsed.
+     */
+    @Test(expected = CsvParsingException.class)
+    public void testParseCsvFileWhenDateIsIncorrect() throws Exception {
+        //EXERCISE
+        csvParser.parseCsvFile("src/test/testData/1.csv");
+    }
+
+    /**
+     * Tests {@link service.parser.CsvParser#parseCsvFile(String)} when the file doesn't exist.
+     */
+    @Test(expected = CsvParsingException.class)
+    public void testParseCsvFileWhenFileNotFound() throws Exception {
+        //EXERCISE
+        csvParser.parseCsvFile("src/test/testData/2.csv");
+    }
 }

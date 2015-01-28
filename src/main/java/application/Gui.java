@@ -73,9 +73,11 @@ public class Gui {
             PersonEntity personEntity = idToPersonEntityMap.get(personId);
             personEntity.setSalary(runningService.getWageService().calculateTotalSalary(personEntity));
         }
-        if (idToPersonEntityMap != null) {
+        if (!idToPersonEntityMap.isEmpty()) {
             JTable table = createTable();
             table.setModel(fillTable());
+        } else {
+            showErrorMessage("Unfortunately the parsing data is empty. Please, verify if you load a proper file and try again.");
         }
     }
 

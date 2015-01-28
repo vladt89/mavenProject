@@ -36,6 +36,7 @@ public class CsvParser {
      * @return map of person ids to person entity
      */
     public Map<Integer, PersonEntity> parseCsvFile(String pathToFile) throws CsvParsingException {
+        LOG.info("Start parsing csv file");
         CSVFormat format = CSVFormat.RFC4180.withHeader().withDelimiter(',');
         CSVParser parser;
         try {
@@ -55,23 +56,30 @@ public class CsvParser {
                 person.setId(personId);
                 person.getWorkingDays().add(parseDate(record));
                 idToPersonEntityMap.put(personId, person);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("New person found: " + person.getName() + " [" + personId + "]");
+                }
             } else {
                 PersonEntity person = idToPersonEntityMap.get(personId);
                 person.getWorkingDays().add(parseDate(record));
             }
         }
+        LOG.info("Parsing csv file finished successfully");
         return idToPersonEntityMap;
     }
 
-    private WorkTime parseDate(CSVRecord record) {
+    private WorkTime parseDate(CSVRecord record) throws CsvParsingException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyyHH:mm");
-        Date startTime = null;
-        Date endTime = null;
+        Date startTime;
+        Date endTime;
         try {
-            startTime = dateFormat.parse(record.get("Date") + record.get("Start"));
-            endTime = dateFormat.parse(record.get("Date") + record.get("End"));
+            String date = record.get("Date");
+            startTime = dateFormat.parse(date + record.get("Start"));
+            endTime = dateFormat.parse(date + record.get("End"));
         } catch (ParseException e) {
-            e.printStackTrace();
+            String message = "Cannot parse the record: " + record + ", " + e;
+            LOG.error(message);
+            throw new CsvParsingException(message);
         }
         WorkTime workTime = new WorkTime();
         workTime.setStartTime(startTime);
