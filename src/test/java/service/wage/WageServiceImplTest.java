@@ -7,9 +7,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import repository.PersonEntity;
+import repository.WorkTime;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Test class for {@link service.wage.WageServiceImpl}.
@@ -136,5 +141,54 @@ public class WageServiceImplTest {
                 + WageServiceImpl.OVERTIME_PERCENT_FOR_SECOND_2_HOURS * 2
                 + WageServiceImpl.OVERTIME_PERCENT_AFTER_4_HOURS;
         Assert.assertEquals(expected, result, DELTA);
+    }
+
+    /**
+     * Tests {@link service.wage.WageServiceImpl#calculateSalariesPerMonth(repository.PersonEntity)}
+     * when the person worked two days without overtime or during the evening.
+     */
+    @Test
+    public void testCalculateSalariesPerMonth() throws Exception {
+        //SETUP SUT
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        Date startDate = sdf.parse("21/12/2012 10:00");
+        Date endDate = sdf.parse("21/12/2012 15:00");
+
+        Date startDate2 = sdf.parse("10/12/2012 9:00");
+        Date endDate2 = sdf.parse("10/12/2012 10:00");
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(startDate);
+        int monthDecember = cal.get(Calendar.MONTH);
+
+        WorkTime workTime = createWorkTime(startDate, endDate, monthDecember);
+        WorkTime workTime2 = createWorkTime(startDate2, endDate2, monthDecember);
+
+        List<WorkTime> workingDays = new ArrayList<>(2);
+        workingDays.add(workTime);
+        workingDays.add(workTime2);
+
+        PersonEntity person = new PersonEntity();
+        person.setWorkingDays(workingDays);
+
+        //EXERCISE
+        Double[] salariesPerMonth = wageService.calculateSalariesPerMonth(person);
+
+        //PREPARE DATA
+        double workHoursInFirstDay = (double) (endDate.getTime() - startDate.getTime())/1000/60/60;
+        double workHoursInSecondDay = (double) (endDate2.getTime() - startDate2.getTime())/1000/60/60;
+        double expectedSalaryInDecember = (workHoursInFirstDay + workHoursInSecondDay) * WageServiceImpl.HOURLY_WAGE;
+
+        //VERIFY
+        Assert.assertEquals(expectedSalaryInDecember, salariesPerMonth[monthDecember], DELTA);
+
+    }
+
+    private WorkTime createWorkTime(Date startDate, Date endDate, int monthDecember) {
+        WorkTime workTime = new WorkTime();
+        workTime.setStartTime(startDate);
+        workTime.setEndTime(endDate);
+        workTime.setMonth(monthDecember);
+        return workTime;
     }
 }

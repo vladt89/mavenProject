@@ -23,6 +23,10 @@ public class PersonEntity {
         return id;
     }
 
+    public void setWorkingDays(List<WorkTime> workingDays) {
+        this.workingDays = workingDays;
+    }
+
     public List<WorkTime> getWorkingDays() {
         return workingDays;
     }
